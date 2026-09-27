@@ -1,5 +1,7 @@
 # onion-proxy
 
+Windows executable downloads are published under [GitHub Releases](https://github.com/haxxdotse/onion-proxy/releases).
+
 onion-proxy is a small Windows app that helps you see some of the data programs send over the internet. It routes supported requests through a local proxy and can warn you when it spots things like a phone number, email address, or password. You can allow or block a request from the browser dashboard.
 
 You can also keep a list of sites that should always be blocked and a list of sites that should be skipped. The dashboard and proxy run on your computer.
