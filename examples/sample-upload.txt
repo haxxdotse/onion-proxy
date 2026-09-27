@@ -1,0 +1,1 @@
+Harmless sample file for checking the FILE detector.

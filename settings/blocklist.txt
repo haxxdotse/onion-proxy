@@ -1,0 +1,6 @@
+# One destination per line. Matching a domain also blocks all its subdomains.
+# Examples:
+# noisy.example
+# https://noisy.example/api/private/
+# api.noisy.example:8443
+# URL paths match that path and its subpaths. Scheme and port are optional.

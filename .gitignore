@@ -1,0 +1,43 @@
+# Python environments and caches
+.venv/
+venv/
+.build-venv/
+__pycache__/
+*.py[cod]
+
+# Generated build files
+build/
+build-*/
+build-package/
+dist/
+dist-*/
+*.spec
+
+# Local runtime data (may contain observed security events)
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+*.log
+
+# Local secrets and proxy certificates
+.env
+.env.*
+!.env.example
+.mitmproxy/
+*.p12
+
+# Editor-specific settings
+.vscode/
+
+# Test/tool caches and coverage reports
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Generated release binary and its checksum; retain release documentation in version control
+/release-onion-proxy/onion-proxy.exe
+/release-onion-proxy/SHA256SUMS.txt

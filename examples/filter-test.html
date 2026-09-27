@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>onion-proxy — проверка фильтров</title>
+  <style>
+    body { max-width: 760px; margin: 36px auto; padding: 0 18px; font: 16px/1.5 system-ui, sans-serif; color: #202124; }
+    h1 { margin-bottom: 8px; }
+    .note { padding: 12px 16px; background: #eef4ff; border-radius: 8px; }
+    section { margin: 18px 0; padding: 14px 16px; border: 1px solid #ddd; border-radius: 8px; }
+    button { padding: 8px 14px; cursor: pointer; }
+    input, textarea { margin: 6px 0; padding: 7px; }
+  </style>
+</head>
+<body>
+  <h1>onion-proxy — проверка фильтров</h1>
+  <p class="note">Оставьте onion-proxy запущенным и нажимайте кнопки по одной. Тесты отправляют только синтетические данные на example.com. Ответ 405 ожидаем; в предупреждении можно сверить найденное значение.</p>
+
+  <section>
+    <h2>PHONE (синтетический номер)</h2>
+    <form action="http://example.com/" method="post" enctype="application/x-www-form-urlencoded">
+      <input type="hidden" name="phone" value="+1 (202) 555-0147">
+      <button type="submit">Проверить PHONE</button>
+    </form>
+    <p>Если сработает, в evidence должен отображаться этот же номер: <code>+1 (202) 555-0147</code>.</p>
+  </section>
+
+  <section>
+    <h2>EMAIL</h2>
+    <form action="http://example.com/" method="post" enctype="application/x-www-form-urlencoded">
+      <input type="hidden" name="email" value="demo@example.com">
+      <button type="submit">Проверить EMAIL</button>
+    </form>
+  </section>
+
+  <section>
+    <h2>PASSWORD</h2>
+    <form action="http://example.com/" method="post" enctype="application/x-www-form-urlencoded">
+      <input type="hidden" name="password" value="demo-password-123">
+      <button type="submit">Проверить PASSWORD</button>
+    </form>
+  </section>
+
+  <section>
+    <h2>API_KEY</h2>
+    <form action="http://example.com/" method="post" enctype="application/x-www-form-urlencoded">
+      <input type="hidden" name="api_key" value="demo-key-1234567890">
+      <button type="submit">Проверить API_KEY</button>
+    </form>
+  </section>
+
+  <section>
+    <h2>PRIVATE_KEY</h2>
+    <form action="http://example.com/" method="post" enctype="application/x-www-form-urlencoded">
+      <input type="hidden" name="key" value="-----BEGIN PRIVATE KEY-----">
+      <button type="submit">Проверить PRIVATE_KEY</button>
+    </form>
+  </section>
+
+  <section>
+    <h2>FILE</h2>
+    <p>Выбери файл <code>sample-upload.txt</code> из этой же папки.</p>
+    <form action="http://example.com/" method="post" enctype="multipart/form-data">
+      <input type="file" name="upload" accept=".txt" required>
+      <button type="submit">Проверить FILE</button>
+    </form>
+  </section>
+
+  <section>
+    <h2>SENSITIVE_FILENAME</h2>
+    <p>Выберите синтетический файл <code>test-credentials.env</code>. Он проверит распознавание имени и тестового пароля.</p>
+    <form action="http://example.com/" method="post" enctype="multipart/form-data">
+      <input type="file" name="upload" accept=".env" required>
+      <button type="submit">Проверить подозрительное имя</button>
+    </form>
+  </section>
+</body>
+</html>

@@ -1,0 +1,9 @@
+# Requests to these domains bypass onion-proxy content inspection.
+# One domain per line. Subdomains are included automatically.
+# Edit this file and restart onion-proxy for changes to take effect.
+youtube.com
+googlevideo.com
+ytimg.com
+youtubei.googleapis.com
+events.data.microsoft.com
+yandex.ru
