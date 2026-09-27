@@ -4,6 +4,8 @@ onion-proxy is a small Windows app that helps you see some of the data programs 
 
 You can also keep a list of sites that should always be blocked and a list of sites that should be skipped. The dashboard and proxy run on your computer.
 
+The dashboard also has an observation mode. It records detected requests while allowing them through, so you can see how the checks behave before using the allow/block prompt. Matched phone numbers, email addresses, passwords, tokens, payment card numbers, and IBANs are masked in the event details.
+
 ## Getting started
 
 Download the files in `release-onion-proxy`, start `onion-proxy.exe`, and turn protection on from the browser dashboard. When you are done, use the dashboard's stop-and-exit button so Windows proxy settings are restored.
@@ -17,3 +19,7 @@ onion-proxy is not an antivirus and cannot detect every threat or every way data
 ## Building from source
 
 Run `build.ps1` in PowerShell. The script creates `.build-venv`, installs the packages listed in `requirements-build.txt`, and puts the Windows executable in `release-onion-proxy`.
+
+## Running the detection checks
+
+With the project's Python dependencies installed, run `python -m unittest discover -s tests -v`. These checks cover a real phone-number example, ordinary telemetry text, and evidence masking.

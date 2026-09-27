@@ -33,6 +33,7 @@ if ($LASTEXITCODE -ne 0) { throw "Build dependency installation failed with exit
     --collect-all mitmproxy_rs `
     --collect-all publicsuffix2 `
     --collect-all certifi `
+    --hidden-import mitmproxy_windows `
     --additional-hooks-dir "$projectRoot\packaging\hooks" `
     --copy-metadata mitmproxy `
     "--add-data=$projectRoot\settings\ignore_domains.txt;settings" `

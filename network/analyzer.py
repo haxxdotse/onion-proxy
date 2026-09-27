@@ -16,6 +16,23 @@ PHONE_FIELD_HINT = re.compile(
 )
 
 
+def mask_evidence_value(kind: str, value: str) -> str:
+    """Keep enough context to explain a finding without displaying the secret."""
+    if kind == "PHONE":
+        positions = [index for index, char in enumerate(value) if char.isdigit()]
+        if len(positions) <= 4:
+            return "•" * len(value)
+        hidden = set(positions[2:-2])
+        return "".join("•" if index in hidden else char for index, char in enumerate(value))
+    if kind == "EMAIL" and "@" in value:
+        local, domain = value.rsplit("@", 1)
+        visible_local = local[:1] + ("•" * max(1, len(local) - 1))
+        return f"{visible_local}@{domain}"
+    if kind in {"PASSWORD", "API_KEY", "ACCESS_TOKEN", "JWT", "PRIVATE_KEY", "CREDIT_CARD", "IBAN"}:
+        return "[скрыто]"
+    return value
+
+
 def analyze_request_details(request) -> tuple[list[str], list[dict[str, str]]]:
     """Return detection labels and short-lived matched values for the local UI."""
     findings: list[str] = []
@@ -33,7 +50,7 @@ def analyze_request_details(request) -> tuple[list[str], list[dict[str, str]]]:
         key = (kind, value, source)
         if key not in seen_evidence and len(evidence) < MAX_EVIDENCE_ITEMS:
             seen_evidence.add(key)
-            evidence.append({"type": kind, "value": value, "source": source})
+            evidence.append({"type": kind, "value": mask_evidence_value(kind, value), "source": source})
 
     def scan(value: str, source: str) -> None:
         for kind, pattern in CREDENTIAL_PATTERNS:

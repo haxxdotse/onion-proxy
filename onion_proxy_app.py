@@ -91,6 +91,23 @@ def prepare_app_data() -> tuple[Path, Path]:
     return ignore_path, blocklist_path
 
 
+def load_preferences() -> dict:
+    path = APP_DATA / "preferences.json"
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+        return value if isinstance(value, dict) else {}
+    except (OSError, json.JSONDecodeError):
+        return {}
+
+
+def save_preferences(value: dict) -> None:
+    APP_DATA.mkdir(parents=True, exist_ok=True)
+    path = APP_DATA / "preferences.json"
+    temporary = path.with_suffix(".tmp")
+    temporary.write_text(json.dumps(value, ensure_ascii=False), encoding="utf-8")
+    temporary.replace(path)
+
+
 def find_available_port() -> int:
     for port in range(PREFERRED_PORT, PREFERRED_PORT + 20):
         probe = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -220,6 +237,7 @@ class OnionProxyAddon:
         self.block_rules = block_rules
         self.events = events
         self.sound_enabled = True
+        self.observation_mode = False
         self.last_alert_sound: dict[str, float] = {}
         self.last_block_db: dict[str, float] = {}
         self.block_counters: dict[str, list[float | int]] = {}
@@ -265,7 +283,7 @@ class OnionProxyAddon:
         if not findings:
             return
         application = "UNKNOWN"
-        action = decide(application, domain, findings)
+        action = "MONITOR" if self.observation_mode else decide(application, domain, findings)
         if action == "ASK":
             now = time.monotonic()
             if self.sound_enabled and now - self.last_alert_sound.get(domain, 0.0) >= 2.0:
@@ -329,6 +347,7 @@ class DashboardController:
         self.group_by_domain: dict[str, str] = {}
         self.addon: OnionProxyAddon | None = None
         self.sound_enabled = True
+        self.observation_mode = bool(load_preferences().get("observation_mode", False))
         self.alerts: list[dict] = []
         self.activity: list[dict] = []
         self.last_error: str | None = None
@@ -349,6 +368,7 @@ class DashboardController:
                 load_ignored_domains(self.ignore_path), load_blocklist(self.blocklist_path), self.events,
             )
             addon.sound_enabled = self.sound_enabled
+            addon.observation_mode = self.observation_mode
             self.addon = addon
 
             def worker() -> None:
@@ -402,6 +422,15 @@ class DashboardController:
             message = "Notification sound on." if self.sound_enabled else "Notification sound off."
             return {"ok": True, "sound_enabled": self.sound_enabled, "message": message}
 
+    def toggle_observation(self) -> dict:
+        with self.lock:
+            self.observation_mode = not self.observation_mode
+            if self.addon:
+                self.addon.observation_mode = self.observation_mode
+            save_preferences({"observation_mode": self.observation_mode})
+            message = "Режим наблюдения включён: запросы не блокируются." if self.observation_mode else "Режим наблюдения выключен."
+            return {"ok": True, "observation_mode": self.observation_mode, "message": message}
+
     def block_domain(self, alert_id: str) -> dict:
         self._drain_events()
         with self.lock:
@@ -452,6 +481,7 @@ class DashboardController:
                 "activity": list(self.activity),
                 "error": self.last_error,
                 "sound_enabled": self.sound_enabled,
+                "observation_mode": self.observation_mode,
             }
 
     def _drain_events(self) -> None:
@@ -620,6 +650,8 @@ class DashboardHandler(BaseHTTPRequestHandler):
             response = self.server.controller.block_domain(str(payload.get("id", "")))
         elif path == "toggle-sound":
             response = self.server.controller.toggle_sound()
+        elif path == "toggle-observation":
+            response = self.server.controller.toggle_observation()
         else:
             self.send_error(404)
             return
